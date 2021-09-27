@@ -34,6 +34,7 @@ func (m *manager) OnChannelOpened(chid datatransfer.ChannelID) error {
 // calls revalidators so they can pause / resume the channel or send a
 // message over the transport.
 func (m *manager) OnDataReceived(chid datatransfer.ChannelID, link ipld.Link, size uint64) error {
+	log.Infow("[OnDataReceived]", "channelId", chid)
 	isNew, err := m.channels.DataReceived(chid, link.(cidlink.Link).Cid, size)
 	if err != nil {
 		return err
@@ -71,7 +72,7 @@ func (m *manager) OnDataReceived(chid datatransfer.ChannelID, link ipld.Link, si
 		}
 		return err
 	}
-
+	log.Infow("[OnDataReceived] end", "channelId", chid)
 	return nil
 }
 

@@ -341,8 +341,10 @@ func (t *Transport) UseStore(channelID datatransfer.ChannelID, lsys ipld.LinkSys
 
 // gsOutgoingRequestHook is called when a graphsync request is made
 func (t *Transport) gsOutgoingRequestHook(p peer.ID, request graphsync.RequestData, hookActions graphsync.OutgoingRequestHookActions) {
+	log.Infow("[gsOutgoingRequestHook]", "requestId", request.ID())
 	message, _ := extension.GetTransferData(request, t.supportedExtensions)
 
+	log.Infow("[gsOutgoingRequestHook]", "requestId", request.ID(), "message", message)
 	// extension not found; probably not our request.
 	if message == nil {
 		return
@@ -383,6 +385,7 @@ func (t *Transport) gsOutgoingRequestHook(p peer.ID, request graphsync.RequestDa
 	// Signal that the channel has been opened
 	gsKey := graphsyncKey{request.ID(), t.peerID}
 	ch.gsReqOpened(gsKey, hookActions)
+	log.Infow("[gsOutgoingRequestHook] end", "requestId", request.ID())
 }
 
 // gsIncomingBlockHook is called when a block is received
@@ -392,6 +395,7 @@ func (t *Transport) gsIncomingBlockHook(p peer.ID, response graphsync.ResponseDa
 		return
 	}
 
+	log.Infow("[gsIncomingBlockHook]", "channelId", chid)
 	err := t.events.OnDataReceived(chid, block.Link(), block.BlockSize())
 	if err != nil && err != datatransfer.ErrPause {
 		hookActions.TerminateWithError(err)

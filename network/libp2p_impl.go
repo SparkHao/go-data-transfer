@@ -154,7 +154,7 @@ func (dtnet *libp2pDataTransferNetwork) SendMessage(
 	ctx context.Context,
 	p peer.ID,
 	outgoing datatransfer.Message) error {
-
+	log.Infow("[SendMessage]", "TransferID", outgoing.TransferID())
 	s, err := dtnet.openStream(ctx, p, dtnet.dtProtocols...)
 	if err != nil {
 		return err
@@ -172,7 +172,7 @@ func (dtnet *libp2pDataTransferNetwork) SendMessage(
 		}
 		return err
 	}
-
+	defer log.Infow("[SendMessage] end", "TransferID", outgoing.TransferID())
 	return s.Close()
 }
 

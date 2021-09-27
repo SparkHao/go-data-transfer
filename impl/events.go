@@ -126,6 +126,7 @@ func (m *manager) OnDataSent(chid datatransfer.ChannelID, link ipld.Link, size u
 }
 
 func (m *manager) OnRequestReceived(chid datatransfer.ChannelID, request datatransfer.Request) (datatransfer.Response, error) {
+	log.Infow("[OnRequestReceived]", "channelId", chid)
 	if request.IsRestart() {
 		return m.receiveRestartRequest(chid, request)
 	}
@@ -145,6 +146,8 @@ func (m *manager) OnRequestReceived(chid datatransfer.ChannelID, request datatra
 	if request.IsPaused() {
 		return nil, m.pauseOther(chid)
 	}
+
+	log.Infow("[OnRequestReceived] before resumeOther", "channelId", chid)
 	err := m.resumeOther(chid)
 	if err != nil {
 		return nil, err
@@ -157,6 +160,7 @@ func (m *manager) OnRequestReceived(chid datatransfer.ChannelID, request datatra
 		chst.Status() == datatransfer.ResponderFinalizing {
 		return nil, datatransfer.ErrPause
 	}
+	defer log.Infow("[OnRequestReceived] end", "channelId", chid)
 	return nil, nil
 }
 
@@ -165,6 +169,7 @@ func (m *manager) OnTransferQueued(chid datatransfer.ChannelID) {
 }
 
 func (m *manager) OnResponseReceived(chid datatransfer.ChannelID, response datatransfer.Response) error {
+	log.Infow("[OnResponseReceived]", "channelId", chid)
 	if response.IsComplete() {
 		log.Infow("received complete response", "chid", chid, "isAccepted", response.Accepted())
 	}
@@ -219,6 +224,9 @@ func (m *manager) OnResponseReceived(chid datatransfer.ChannelID, response datat
 	if response.IsPaused() {
 		return m.pauseOther(chid)
 	}
+
+	defer log.Infow("[OnResponseReceived] end", "channelId", chid)
+
 	return m.resumeOther(chid)
 }
 

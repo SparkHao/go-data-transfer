@@ -38,3 +38,5 @@ require (
 	golang.org/x/tools v0.1.1-0.20210225150353-54dc8c5edb56 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
 )
+
+replace github.com/ipfs/go-graphsync => ../go-graphsync

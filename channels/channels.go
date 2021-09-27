@@ -262,6 +262,7 @@ func (c *Channels) ResumeInitiator(chid datatransfer.ChannelID) error {
 
 // ResumeResponder resumes the responder of this channel
 func (c *Channels) ResumeResponder(chid datatransfer.ChannelID) error {
+	log.Infow("[ResumeResponder] send channelId to ResumeResponder", "channelId", chid)
 	return c.send(chid, datatransfer.ResumeResponder)
 }
 
@@ -408,7 +409,7 @@ func (c *Channels) send(chid datatransfer.ChannelID, code datatransfer.EventCode
 	if err != nil {
 		return err
 	}
-	log.Debugw("send data transfer event", "name", datatransfer.Events[code], "transfer ID", chid.ID, "args", args)
+	log.Infow("send data transfer event", "name", datatransfer.Events[code], "transfer ID", chid.ID, "args", args)
 	return c.stateMachines.Send(chid, code, args...)
 }
 

@@ -21,6 +21,7 @@ func (r *receiver) ReceiveRequest(
 	ctx context.Context,
 	initiator peer.ID,
 	incoming datatransfer.Request) {
+	log.Infow("[ReceiveRequest]", "TransferID", incoming.TransferID())
 	err := r.receiveRequest(ctx, initiator, incoming)
 	if err != nil {
 		log.Warnf("error processing request from %s: %s", initiator, err)
@@ -29,6 +30,8 @@ func (r *receiver) ReceiveRequest(
 
 func (r *receiver) receiveRequest(ctx context.Context, initiator peer.ID, incoming datatransfer.Request) error {
 	chid := datatransfer.ChannelID{Initiator: initiator, Responder: r.manager.peerID, ID: incoming.TransferID()}
+
+	log.Infow("[receiveRequest]", "channelId", chid)
 	response, receiveErr := r.manager.OnRequestReceived(chid, incoming)
 
 	if receiveErr == datatransfer.ErrResume {
@@ -72,7 +75,7 @@ func (r *receiver) receiveRequest(ctx context.Context, initiator peer.ID, incomi
 		_ = r.manager.transport.CloseChannel(ctx, chid)
 		return receiveErr
 	}
-
+	defer log.Infow("[receiveRequest] end", "channelId", chid)
 	return nil
 }
 
@@ -82,6 +85,7 @@ func (r *receiver) ReceiveResponse(
 	ctx context.Context,
 	sender peer.ID,
 	incoming datatransfer.Response) {
+	log.Infow("[ReceiveResponse]", "TransferID", incoming.TransferID())
 	err := r.receiveResponse(ctx, sender, incoming)
 	if err != nil {
 		log.Error(err)
@@ -92,6 +96,9 @@ func (r *receiver) receiveResponse(
 	sender peer.ID,
 	incoming datatransfer.Response) error {
 	chid := datatransfer.ChannelID{Initiator: r.manager.peerID, Responder: sender, ID: incoming.TransferID()}
+
+	log.Infow("[receiveResponse]", "channelId", chid)
+
 	err := r.manager.OnResponseReceived(chid, incoming)
 	if err == datatransfer.ErrPause {
 		return r.manager.transport.(datatransfer.PauseableTransport).PauseChannel(ctx, chid)

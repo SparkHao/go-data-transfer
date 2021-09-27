@@ -502,6 +502,7 @@ func (t *Transport) gsReqQueuedHook(p peer.ID, request graphsync.RequestData) {
 
 // gsReqRecdHook is called when graphsync receives an incoming request for data
 func (t *Transport) gsReqRecdHook(p peer.ID, request graphsync.RequestData, hookActions graphsync.IncomingRequestHookActions) {
+	log.Infow("[gsReqRecdHook]")
 	// if this is a push request the sender is us.
 	msg, err := extension.GetTransferData(request, t.supportedExtensions)
 	if err != nil {
@@ -528,7 +529,7 @@ func (t *Transport) gsReqRecdHook(p peer.ID, request graphsync.RequestData, hook
 		// initiated a pull
 		chid = datatransfer.ChannelID{ID: msg.TransferID(), Initiator: p, Responder: t.peerID}
 
-		log.Debugf("%s: received request for data (pull)", chid)
+		log.Infof("%s: received request for data (pull)", chid)
 
 		// Lock the channel for the duration of this method
 		ch = t.trackDTChannel(chid)
@@ -543,7 +544,7 @@ func (t *Transport) gsReqRecdHook(p peer.ID, request graphsync.RequestData, hook
 		// for data
 		chid = datatransfer.ChannelID{ID: msg.TransferID(), Initiator: t.peerID, Responder: p}
 
-		log.Debugf("%s: received request for data (push)", chid)
+		log.Infof("%s: received request for data (push)", chid)
 
 		// Lock the channel for the duration of this method
 		ch = t.trackDTChannel(chid)
@@ -959,7 +960,7 @@ func (c *dtChannel) gsReqOpened(gsKey graphsyncKey, hookActions graphsync.Outgoi
 // for data.
 // Note: Must be called under the lock.
 func (c *dtChannel) gsDataRequestRcvd(gsKey graphsyncKey, hookActions graphsync.IncomingRequestHookActions) {
-	log.Debugf("%s: received request for data", c.channelID)
+	log.Infof("%s: received request for data", c.channelID)
 
 	// If the requester had previously cancelled their request, send any
 	// message that was queued since the cancel

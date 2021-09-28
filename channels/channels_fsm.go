@@ -52,12 +52,14 @@ var ChannelEvents = fsm.Events{
 	}),
 	fsm.Event(datatransfer.DataReceived).FromAny().ToNoChange().Action(func(chst *internal.ChannelState) error {
 		chst.AddLog("DataReceived")
+		log.Infow("---DataReceived---", "TransferID", chst.TransferID)
 		return nil
 	}),
 	fsm.Event(datatransfer.DataReceivedProgress).FromMany(transferringStates...).ToNoChange().
 		Action(func(chst *internal.ChannelState, delta uint64) error {
 			chst.Received += delta
 			chst.AddLog("received data")
+			log.Infow("---DataReceivedProgress---", "TransferID", chst.TransferID)
 			return nil
 		}),
 
@@ -66,6 +68,7 @@ var ChannelEvents = fsm.Events{
 		From(datatransfer.TransferFinished).ToNoChange().
 		Action(func(chst *internal.ChannelState) error {
 			chst.AddLog("DataSent -> TransferFinished")
+			log.Infow("---DataSent -> TransferFinished---", "TransferID", chst.TransferID)
 			return nil
 		}),
 
@@ -73,6 +76,7 @@ var ChannelEvents = fsm.Events{
 		Action(func(chst *internal.ChannelState, delta uint64) error {
 			chst.Sent += delta
 			chst.AddLog("sending data")
+			log.Infow("---DataSentProgress---", "TransferID", chst.TransferID)
 			return nil
 		}),
 
@@ -81,12 +85,14 @@ var ChannelEvents = fsm.Events{
 		From(datatransfer.TransferFinished).ToNoChange().
 		Action(func(chst *internal.ChannelState) error {
 			chst.AddLog("")
+			log.Infow("---DataQueued---", "TransferID", chst.TransferID)
 			return nil
 		}),
 	fsm.Event(datatransfer.DataQueuedProgress).FromMany(transferringStates...).ToNoChange().
 		Action(func(chst *internal.ChannelState, delta uint64) error {
 			chst.Queued += delta
-			chst.AddLog("")
+			chst.AddLog("DataQueuedProgress")
+			log.Infow("---DataQueuedProgress---", "TransferID", chst.TransferID)
 			return nil
 		}),
 	fsm.Event(datatransfer.Disconnected).FromAny().ToNoChange().Action(func(chst *internal.ChannelState, err error) error {

@@ -173,6 +173,7 @@ func (t *Transport) consumeResponses(req *gsReq) error {
 	log.Infof("channel %s: finished consuming graphsync response channel", req.channelID)
 
 	for err := range req.errChan {
+		log.Infow("[consumeResponses]", "error", err)
 		lastError = err
 	}
 	log.Infof("channel %s: finished consuming graphsync error channel", req.channelID)

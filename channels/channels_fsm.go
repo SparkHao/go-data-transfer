@@ -37,7 +37,7 @@ var ChannelEvents = fsm.Events{
 
 	fsm.Event(datatransfer.TransferRequestQueued).FromAny().ToJustRecord().Action(func(chst *internal.ChannelState) error {
 		chst.Message = ""
-		chst.AddLog("")
+		chst.AddLog("TransferRequestQueued")
 		return nil
 	}),
 
@@ -51,7 +51,7 @@ var ChannelEvents = fsm.Events{
 		return nil
 	}),
 	fsm.Event(datatransfer.DataReceived).FromAny().ToNoChange().Action(func(chst *internal.ChannelState) error {
-		chst.AddLog("")
+		chst.AddLog("DataReceived")
 		return nil
 	}),
 	fsm.Event(datatransfer.DataReceivedProgress).FromMany(transferringStates...).ToNoChange().
@@ -65,7 +65,7 @@ var ChannelEvents = fsm.Events{
 		FromMany(transferringStates...).ToNoChange().
 		From(datatransfer.TransferFinished).ToNoChange().
 		Action(func(chst *internal.ChannelState) error {
-			chst.AddLog("")
+			chst.AddLog("DataSent -> TransferFinished")
 			return nil
 		}),
 

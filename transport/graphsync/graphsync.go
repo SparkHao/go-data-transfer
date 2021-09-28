@@ -413,6 +413,7 @@ func (t *Transport) gsBlockSentHook(p peer.ID, request graphsync.RequestData, bl
 	// if they are in the list (meaning, they aren't actually sent over the
 	// wire). So here we check if the block was actually sent
 	// over the wire before firing the data sent event.
+	log.Infow("[gsBlockSentHook]", "requestId", request.ID(), "blockSize", block.BlockSize())
 	if block.BlockSizeOnWire() == 0 {
 		return
 	}

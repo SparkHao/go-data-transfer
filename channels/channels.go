@@ -214,6 +214,7 @@ func (c *Channels) GetByID(ctx context.Context, chid datatransfer.ChannelID) (da
 
 // Accept marks a data transfer as accepted
 func (c *Channels) Accept(chid datatransfer.ChannelID) error {
+	log.Infow("[Accept]", "channelId", chid)
 	return c.send(chid, datatransfer.Accept)
 }
 

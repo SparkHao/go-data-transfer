@@ -245,7 +245,7 @@ func (mc *monitoredChannel) start() {
 	mc.shutdownLk.Lock()
 	defer mc.shutdownLk.Unlock()
 
-	log.Debugf("%s: starting data-transfer channel monitoring", mc.chid)
+	log.Infof("%s: starting data-transfer channel monitoring", mc.chid)
 
 	// Watch to make sure the responder accepts the channel in time
 	cancelAcceptTimer := mc.watchForResponderAccept()
@@ -259,7 +259,7 @@ func (mc *monitoredChannel) start() {
 		// Once the channel completes, shut down the monitor
 		state := channelState.Status()
 		if channels.IsChannelCleaningUp(state) || channels.IsChannelTerminated(state) {
-			log.Debugf("%s: stopping data-transfer channel monitoring (event: %s / state: %s)",
+			log.Infof("%s: stopping data-transfer channel monitoring (event: %s / state: %s)",
 				mc.chid, datatransfer.Events[event.Code], datatransfer.Statuses[channelState.Status()])
 			go mc.Shutdown()
 			return
@@ -268,6 +268,7 @@ func (mc *monitoredChannel) start() {
 		switch event.Code {
 		case datatransfer.Accept:
 			// The Accept event is fired when we receive an Accept message from the responder
+			log.Infow("[monitoredChannel]", "state Accept", datatransfer.Accept, "channelId", mc.chid)
 			cancelAcceptTimer()
 		case datatransfer.SendDataError:
 			// If the transport layer reports an error sending data over the wire,
@@ -287,6 +288,7 @@ func (mc *monitoredChannel) start() {
 		case datatransfer.DataSent, datatransfer.DataReceived:
 			// Some data was sent / received so reset the consecutive restart
 			// counter
+			log.Infow("[monitoredChannel]", "state", event.Code, "channelId", mc.chid)
 			mc.resetConsecutiveRestarts()
 		}
 	})
